@@ -24,12 +24,13 @@ export async function POST(request: Request) {
     }
 
     // Check if password is strong enough
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if (!passwordRegex.test(password)) {
       return NextResponse.json(
         {
           message:
-            "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number",
+            "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
         },
         { status: 400 }
       );

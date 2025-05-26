@@ -84,5 +84,63 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+
+    async signIn({ user, account }) {
+      if (!user.email || !account) return false;
+
+      const existingUser = await prisma.user.findUnique({
+        where: { email: user.email },
+        include: { accounts: true },
+      });
+
+      if (existingUser) {
+        const hasProvider = existingUser.accounts.some(
+          (acc) => acc.provider === account.provider
+        );
+
+        if (!hasProvider) {
+          await prisma.account.create({
+            data: {
+              userId: existingUser.id,
+              type: account.type,
+              provider: account.provider,
+              providerAccountId: account.providerAccountId,
+              access_token: account.access_token,
+              refresh_token: account.refresh_token,
+              expires_at: account.expires_at,
+              token_type: account.token_type,
+              scope: account.scope,
+              id_token: account.id_token,
+              session_state: account.session_state,
+            },
+          });
+        }
+      } else {
+        // 如果用户不存在，则创建 User 和 Account（NextAuth 通常会自动处理）
+        await prisma.user.create({
+          data: {
+            name: user.name || "",
+            email: user.email,
+            image: user.image || "",
+            accounts: {
+              create: {
+                type: account.type,
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+                access_token: account.access_token,
+                refresh_token: account.refresh_token,
+                expires_at: account.expires_at,
+                token_type: account.token_type,
+                scope: account.scope,
+                id_token: account.id_token,
+                session_state: account.session_state,
+              },
+            },
+          },
+        });
+      }
+
+      return true;
+    },
   },
 };

@@ -7,9 +7,11 @@ specifiers:
   '@tailwindcss/postcss': ^4
   '@types/bcrypt': ^5.0.2
   '@types/node': ^20
+  '@types/nodemailer': ^6.4.17
   '@types/react': ^19
   '@types/react-dom': ^19
   bcrypt: ^6.0.0
+  clsx: ^2.1.1
   eslint: ^9
   eslint-config-next: 15.3.2
   next: 15.3.2
@@ -18,6 +20,7 @@ specifiers:
   prisma: ^6.8.2
   react: ^19.0.0
   react-dom: ^19.0.0
+  react-hook-form: ^7.56.4
   tailwindcss: ^4
   typescript: ^5
   zod: ^3.25.23
@@ -27,17 +30,20 @@ dependencies:
   '@prisma/client': 6.8.2_s4tg3ebcmbqqyhlz4bobf5wxka
   '@types/bcrypt': 5.0.2
   bcrypt: 6.0.0
+  clsx: 2.1.1
   next: 15.3.2_j6k6oay3ugsr56slyfvma2drry
   next-auth: 4.24.11_z5kgunmt7fufoycpnlnuy6at2y
   nodemailer: 6.10.1
   react: 19.1.0
   react-dom: 19.1.0_react@19.1.0
+  react-hook-form: 7.56.4_react@19.1.0
   zod: 3.25.23
 
 devDependencies:
   '@eslint/eslintrc': 3.3.1
   '@tailwindcss/postcss': 4.1.7
   '@types/node': 20.17.50
+  '@types/nodemailer': 6.4.17
   '@types/react': 19.1.5
   '@types/react-dom': 19.1.5_@types+react@19.1.5
   eslint: 9.27.0
@@ -813,6 +819,12 @@ packages:
     dependencies:
       undici-types: 6.19.8
 
+  /@types/nodemailer/6.4.17:
+    resolution: {integrity: sha512-I9CCaIp6DTldEg7vyUTZi8+9Vo0hi1/T8gv3C89yk1rSAAzoKQ8H8ki/jBYJSFoH/BisgLP8tkZMlQ91CIquww==}
+    dependencies:
+      '@types/node': 20.17.50
+    dev: true
+
   /@types/react-dom/19.1.5_@types+react@19.1.5:
     resolution: {integrity: sha512-CMCjrWucUBZvohgZxkjd6S9h0nZxXjzus6yDfUb+xLxYM7VvjKNH1tQrE9GWLql1XoOP4/Ds3bwFqShHUYraGg==}
     peerDependencies:
@@ -1325,6 +1337,11 @@ packages:
 
   /client-only/0.0.1:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
+    dev: false
+
+  /clsx/2.1.1:
+    resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
+    engines: {node: '>=6'}
     dev: false
 
   /color-convert/2.0.1:
@@ -2988,6 +3005,15 @@ packages:
     dependencies:
       react: 19.1.0
       scheduler: 0.26.0
+    dev: false
+
+  /react-hook-form/7.56.4_react@19.1.0:
+    resolution: {integrity: sha512-Rob7Ftz2vyZ/ZGsQZPaRdIefkgOSrQSPXfqBdvOPwJfoGnjwRJUs7EM7Kc1mcoDv3NOtqBzPGbcMB8CGn9CKgw==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18 || ^19
+    dependencies:
+      react: 19.1.0
     dev: false
 
   /react-is/16.13.1:
