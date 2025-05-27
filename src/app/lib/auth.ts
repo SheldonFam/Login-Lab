@@ -20,6 +20,10 @@ declare module "next-auth" {
   }
 }
 
+interface Account {
+  provider: string;
+}
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
@@ -95,7 +99,7 @@ export const authOptions: NextAuthOptions = {
 
       if (existingUser) {
         const hasProvider = existingUser.accounts.some(
-          (acc) => acc.provider === account.provider
+          (acc: Account) => acc.provider === account.provider
         );
 
         if (!hasProvider) {
@@ -116,7 +120,6 @@ export const authOptions: NextAuthOptions = {
           });
         }
       } else {
-        // 如果用户不存在，则创建 User 和 Account（NextAuth 通常会自动处理）
         await prisma.user.create({
           data: {
             name: user.name || "",
