@@ -8,7 +8,6 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "../lib/prisma";
 import bcrypt from "bcrypt";
 
-// Extend the built-in session types
 declare module "next-auth" {
   interface Session {
     user: {
@@ -55,12 +54,6 @@ export const authOptions: NextAuthOptions = {
         if (!isValid) {
           throw new Error("Invalid password");
         }
-
-        console.log("Returning:", {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-        });
 
         return {
           id: user.id,

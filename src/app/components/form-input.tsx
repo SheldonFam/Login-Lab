@@ -16,13 +16,14 @@ interface FormInputProps {
   label: string;
   placeholder?: string;
   required?: boolean;
-  register: UseFormRegister<FieldValues>;
-  errors: FieldErrors;
+  register?: UseFormRegister<FieldValues>;
+  errors?: FieldErrors;
   showPasswordToggle?: boolean;
   validation?: RegisterOptions;
   autoComplete?: string;
   disabled?: boolean;
   helperText?: string;
+  showAsterisk?: boolean;
 }
 
 export function FormInput({
@@ -39,6 +40,7 @@ export function FormInput({
   autoComplete,
   disabled = false,
   helperText,
+  showAsterisk = false,
 }: FormInputProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -47,33 +49,50 @@ export function FormInput({
   const inputType =
     showPasswordToggle && isPasswordField && showPassword ? "text" : type;
 
-  const hasError = errors[name];
-  const errorMessage = hasError ? (errors[name]?.message as string) : null;
+  // Safely get the error message string
+  const errorMessage = errors?.[name]?.message as string | undefined;
 
-  const { ref, ...inputProps } = register(name, {
-    ...validation,
-    required: required ? "This field is required" : false,
-  });
+  const registerProps = register
+    ? register(name, {
+        ...validation,
+        required: required ? "This field is required" : false,
+      })
+    : {};
+
+  if (type === "checkbox") {
+    return (
+      <div className="flex items-center">
+        <input
+          id={id}
+          type="checkbox"
+          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+          {...registerProps}
+          disabled={disabled}
+        />
+        <label htmlFor={id} className="ml-2 block text-sm text-gray-900">
+          {label}
+        </label>
+      </div>
+    );
+  }
 
   return (
     <div>
       <label htmlFor={id} className="block text-sm/6 font-medium text-gray-900">
         {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
+        {showAsterisk && <span className="text-red-500 ml-1">*</span>}
       </label>
       <div className="relative mt-2">
         <input
           id={id}
-          ref={ref}
-          {...inputProps}
+          {...registerProps}
           type={inputType}
           placeholder={placeholder}
-          required={required}
           disabled={disabled}
           autoComplete={autoComplete}
-          aria-invalid={hasError ? "true" : "false"}
+          aria-invalid={errorMessage ? "true" : "false"}
           aria-describedby={
-            hasError
+            errorMessage
               ? `${id}-error`
               : helperText
               ? `${id}-description`
@@ -84,11 +103,11 @@ export function FormInput({
             "placeholder:text-gray-400 text-gray-900",
             "outline-none ring-1 ring-inset",
             {
-              "ring-red-500 focus:ring-red-500": hasError,
-              "ring-gray-300 focus:ring-indigo-500": !hasError,
+              "ring-red-500 focus:ring-red-500": errorMessage,
+              "ring-gray-300 focus:ring-indigo-500": !errorMessage,
               "bg-gray-50 cursor-not-allowed": disabled,
               "bg-white": !disabled,
-              "ring-indigo-300": !hasError && isFocused && !disabled,
+              "ring-indigo-300": !errorMessage && isFocused && !disabled,
             }
           )}
           onFocus={() => setIsFocused(true)}
