@@ -75,7 +75,6 @@ export default function LoginPage() {
                 placeholder: "Enter your email",
                 required: true,
                 autoComplete: "email",
-                showAsterisk: true,
               },
               {
                 id: "password",
@@ -86,7 +85,6 @@ export default function LoginPage() {
                 required: true,
                 showPasswordToggle: true,
                 autoComplete: "current-password",
-                showAsterisk: true,
               },
             ]}
             onSubmit={handleSubmit}
