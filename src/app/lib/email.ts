@@ -20,8 +20,14 @@ const transporter = nodemailer.createTransport({
 
 export async function sendResetEmail(email: string, resetUrl: string) {
   try {
+    if (!process.env.GMAIL || !process.env.GOOGLE_APP_PASSWORD) {
+      throw new Error(
+        "Email configuration is missing. Please check your environment variables."
+      );
+    }
+
     const mailOptions = {
-      from: process.env.SMTP_FROM,
+      from: process.env.GMAIL, // Use the same Gmail address as the sender
       to: email,
       subject: "Reset Your Password",
       html: `
