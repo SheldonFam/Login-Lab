@@ -24,6 +24,7 @@ interface FormInputProps {
   disabled?: boolean;
   helperText?: string;
   showAsterisk?: boolean;
+  showError?: boolean;
 }
 
 export function FormInput({
@@ -41,6 +42,7 @@ export function FormInput({
   disabled = false,
   helperText,
   showAsterisk = false,
+  showError = false,
 }: FormInputProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -51,6 +53,7 @@ export function FormInput({
 
   // Safely get the error message string
   const errorMessage = errors?.[name]?.message as string | undefined;
+  const shouldShowError = showError && !!errorMessage;
 
   const registerProps = register
     ? register(name, {
@@ -90,9 +93,9 @@ export function FormInput({
           placeholder={placeholder}
           disabled={disabled}
           autoComplete={autoComplete}
-          aria-invalid={errorMessage ? "true" : "false"}
+          aria-invalid={shouldShowError ? "true" : "false"}
           aria-describedby={
-            errorMessage
+            shouldShowError
               ? `${id}-error`
               : helperText
               ? `${id}-description`
@@ -103,11 +106,11 @@ export function FormInput({
             "placeholder:text-gray-400 text-gray-900",
             "outline-none ring-1 ring-inset",
             {
-              "ring-red-500 focus:ring-red-500": errorMessage,
-              "ring-gray-300 focus:ring-indigo-500": !errorMessage,
+              "ring-red-500 focus:ring-red-500": shouldShowError,
+              "ring-gray-300 focus:ring-indigo-500": !shouldShowError,
               "bg-gray-50 cursor-not-allowed": disabled,
               "bg-white": !disabled,
-              "ring-indigo-300": !errorMessage && isFocused && !disabled,
+              "ring-indigo-300": !shouldShowError && isFocused && !disabled,
             }
           )}
           onFocus={() => setIsFocused(true)}
@@ -159,7 +162,7 @@ export function FormInput({
           </button>
         )}
       </div>
-      {errorMessage && (
+      {shouldShowError && (
         <p
           className="mt-2 text-sm text-red-600"
           id={`${id}-error`}
@@ -168,7 +171,7 @@ export function FormInput({
           {errorMessage}
         </p>
       )}
-      {helperText && !errorMessage && (
+      {helperText && !shouldShowError && (
         <p className="mt-2 text-sm text-gray-500" id={`${id}-description`}>
           {helperText}
         </p>

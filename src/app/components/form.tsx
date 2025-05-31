@@ -29,9 +29,11 @@ export function Form({ fields, onSubmit, submitLabel, isLoading }: FormProps) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    watch,
+    formState: { errors, touchedFields, isSubmitted, dirtyFields },
   } = useForm<FormValues>({
-    mode: "onBlur", // Enable validation on blur
+    mode: "onChange", // Validate on change
+    reValidateMode: "onChange", // Re-validate on change
   });
 
   const getValidationRules = (field: FormProps["fields"][0]) => {
@@ -42,9 +44,28 @@ export function Form({ fields, onSubmit, submitLabel, isLoading }: FormProps) {
     }
 
     if (field.type === "email") {
+      rules.maxLength = {
+        value: 254, // RFC 5321
+        message: "Email must be less than 254 characters",
+      };
       rules.pattern = {
         value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-        message: "Invalid email address",
+        message: "Please enter a valid email address",
+      };
+      rules.validate = {
+        validDomain: (value: string) => {
+          const domain = value.split("@")[1];
+          const commonDomains = [
+            "gmail.com",
+            "yahoo.com",
+            "hotmail.com",
+            "outlook.com",
+          ];
+          if (!commonDomains.includes(domain?.toLowerCase())) {
+            return "Please use a common email domain";
+          }
+          return true;
+        },
       };
     }
 
@@ -53,11 +74,25 @@ export function Form({ fields, onSubmit, submitLabel, isLoading }: FormProps) {
         value: 8,
         message: "Password must be at least 8 characters",
       };
+      rules.maxLength = {
+        value: 128,
+        message: "Password must be less than 128 characters",
+      };
       rules.pattern = {
         value:
           /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
         message:
           "Password must contain at least one uppercase letter, one lowercase letter, one number and one special character",
+      };
+    }
+
+    // Add password confirmation validation
+    if (field.name === "confirmPassword") {
+      rules.validate = {
+        matchesPassword: (value: string) => {
+          const password = watch("password");
+          return value === password || "Passwords do not match";
+        },
       };
     }
 
@@ -81,6 +116,9 @@ export function Form({ fields, onSubmit, submitLabel, isLoading }: FormProps) {
           register={register}
           errors={errors}
           validation={getValidationRules(field)}
+          showError={
+            isSubmitted || touchedFields[field.name] || dirtyFields[field.name]
+          } // Show error if field is touched, dirty, or form is submitted
         />
       ))}
 
