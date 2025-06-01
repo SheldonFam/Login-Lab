@@ -1,38 +1,40 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { prisma } from "../../lib/prisma";
+import {
+  handleApiError,
+  validateEmail,
+  validatePassword,
+  validateRequiredFields,
+  createApiError,
+} from "../../lib/error-handler";
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password } = await request.json();
+    const body = await request.json();
 
-    // Validate input
-    if (!name || !email || !password) {
-      return NextResponse.json(
-        { message: "Missing required fields" },
-        { status: 400 }
-      );
+    // Validate required fields
+    const missingField = validateRequiredFields(body, [
+      "name",
+      "email",
+      "password",
+    ]);
+    if (missingField) {
+      throw createApiError(missingField, 400);
     }
 
-    // Check if email is valid
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { message: "Invalid email format" },
-        { status: 400 }
-      );
+    const { name, email, password } = body;
+
+    // Validate email format
+    if (!validateEmail(email)) {
+      throw createApiError("Invalid email format", 400);
     }
 
-    // Check if password is strong enough
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!passwordRegex.test(password)) {
-      return NextResponse.json(
-        {
-          message:
-            "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
-        },
-        { status: 400 }
+    // Validate password strength
+    if (!validatePassword(password)) {
+      throw createApiError(
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+        400
       );
     }
 
@@ -42,10 +44,7 @@ export async function POST(request: Request) {
     });
 
     if (existingUser) {
-      return NextResponse.json(
-        { message: "User already exists" },
-        { status: 400 }
-      );
+      throw createApiError("User already exists", 400);
     }
 
     // Hash password
@@ -71,23 +70,7 @@ export async function POST(request: Request) {
       },
       { status: 201 }
     );
-  } catch (error: unknown) {
-    if (
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      (error as { code: string }).code === "P2002"
-    ) {
-      return NextResponse.json(
-        { message: "Email already registered" },
-        { status: 400 }
-      );
-    }
-
-    console.error("Registration error:", error);
-    return NextResponse.json(
-      { message: "Error creating user" },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleApiError(error);
   }
 }

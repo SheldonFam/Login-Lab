@@ -2,16 +2,28 @@ import { NextResponse } from "next/server";
 import { prisma } from "../../lib/prisma";
 import crypto from "crypto";
 import { sendResetEmail } from "@/app/lib/email";
+import {
+  handleApiError,
+  validateEmail,
+  validateRequiredFields,
+  createApiError,
+} from "../../lib/error-handler";
 
 export async function POST(request: Request) {
   try {
-    const { email } = await request.json();
+    const body = await request.json();
 
-    if (!email) {
-      return NextResponse.json(
-        { message: "Email is required" },
-        { status: 400 }
-      );
+    // Validate required fields
+    const missingField = validateRequiredFields(body, ["email"]);
+    if (missingField) {
+      throw createApiError(missingField, 400);
+    }
+
+    const { email } = body;
+
+    // Validate email format
+    if (!validateEmail(email)) {
+      throw createApiError("Invalid email format", 400);
     }
 
     // Find user
@@ -44,8 +56,13 @@ export async function POST(request: Request) {
     });
 
     // Send reset email
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${resetToken}`;
-    await sendResetEmail(email, resetUrl);
+    try {
+      const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${resetToken}`;
+      await sendResetEmail(email, resetUrl);
+    } catch (emailError) {
+      console.error("Failed to send reset email:", emailError);
+      throw createApiError("Failed to send reset email", 500);
+    }
 
     return NextResponse.json(
       {
@@ -55,10 +72,6 @@ export async function POST(request: Request) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Forgot password error:", error);
-    return NextResponse.json(
-      { message: "Error processing request" },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

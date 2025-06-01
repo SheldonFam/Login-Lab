@@ -34,6 +34,14 @@ export default function DashboardContent() {
     setLastLogin(formattedDateTime);
   }, []);
 
+  const handleSignOut = async () => {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+    await signOut({
+      redirect: true,
+      callbackUrl: `${baseUrl}/login`,
+    });
+  };
+
   if (isLoading) {
     return <Loading />;
   }
@@ -65,7 +73,7 @@ export default function DashboardContent() {
               <div className="text-sm text-gray-700">{session.user?.email}</div>
               <button
                 type="button"
-                onClick={() => signOut({ callbackUrl: "/login" })}
+                onClick={handleSignOut}
                 className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
                 Sign out
@@ -78,83 +86,11 @@ export default function DashboardContent() {
       {/* Main content */}
       <main className="py-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="bg-white shadow-sm sm:rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h2 className="text-2xl font-bold tracking-tight text-gray-900">
-                Welcome back, {session.user?.name || "User"}!
-              </h2>
-              <p className="mt-2 text-sm text-gray-600">
-                This is your personal dashboard where you can manage your
-                account and view your activity.
-              </p>
-
-              {/* Dashboard content sections */}
-              <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {/* Quick Stats */}
-                <div className="overflow-hidden rounded-lg bg-white shadow">
-                  <div className="p-5">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <svg
-                          className="h-6 w-6 text-gray-400"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                      </div>
-                      <div className="ml-5 w-0 flex-1">
-                        <dl>
-                          <dt className="text-sm font-medium text-gray-500 truncate">
-                            Last Login
-                          </dt>
-                          <dd className="text-lg font-medium text-gray-900">
-                            {lastLogin}
-                          </dd>
-                        </dl>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Account Status */}
-                <div className="overflow-hidden rounded-lg bg-white shadow">
-                  <div className="p-5">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <svg
-                          className="h-6 w-6 text-gray-400"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                      </div>
-                      <div className="ml-5 w-0 flex-1">
-                        <dl>
-                          <dt className="text-sm font-medium text-gray-500 truncate">
-                            Account Status
-                          </dt>
-                          <dd className="text-lg font-medium text-gray-900">
-                            Active
-                          </dd>
-                        </dl>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+          <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
+            <div className="px-4 py-6 sm:p-8">
+              <div className="max-w-2xl text-base leading-7 text-gray-700">
+                <p>Welcome back!</p>
+                <p className="mt-2">Last login: {lastLogin}</p>
               </div>
             </div>
           </div>

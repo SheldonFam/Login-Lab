@@ -1,16 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Form } from "../components/form";
+import { useSearchParams } from "next/navigation";
 
 export default function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+
+  useEffect(() => {
+    if (!token) {
+      setError("Invalid or missing reset token");
+    }
+  }, [token]);
 
   const handleSubmit = async (values: { [key: string]: string }) => {
+    if (!token) {
+      setError("Invalid or missing reset token");
+      return;
+    }
+
     setIsLoading(true);
     setError("");
     setSuccess(false);
@@ -22,7 +36,7 @@ export default function ResetPasswordPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          token: values.token,
+          token,
           password: values.password,
         }),
       });
@@ -67,6 +81,46 @@ export default function ResetPasswordPage() {
       showAsterisk: true,
     },
   ];
+
+  if (!token) {
+    return (
+      <div className="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+          <div className="rounded-md bg-red-50 p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-red-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">
+                  Invalid or missing reset token
+                </h3>
+              </div>
+            </div>
+            <div className="mt-4 text-center">
+              <Link
+                href="/forgot-password"
+                className="font-semibold text-indigo-600 hover:text-indigo-500"
+              >
+                Request a new password reset
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">

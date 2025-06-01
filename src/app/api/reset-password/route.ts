@@ -1,15 +1,30 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../lib/prisma";
 import bcrypt from "bcrypt";
+import {
+  handleApiError,
+  validatePassword,
+  validateRequiredFields,
+  createApiError,
+} from "../../lib/error-handler";
 
 export async function POST(request: Request) {
   try {
-    const { token, password } = await request.json();
+    const body = await request.json();
 
-    if (!token || !password) {
-      return NextResponse.json(
-        { message: "Token and password are required" },
-        { status: 400 }
+    // Validate required fields
+    const missingField = validateRequiredFields(body, ["token", "password"]);
+    if (missingField) {
+      throw createApiError(missingField, 400);
+    }
+
+    const { token, password } = body;
+
+    // Validate password strength
+    if (!validatePassword(password)) {
+      throw createApiError(
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+        400
       );
     }
 
@@ -24,10 +39,7 @@ export async function POST(request: Request) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { message: "Invalid or expired reset token" },
-        { status: 400 }
-      );
+      throw createApiError("Invalid or expired reset token", 400);
     }
 
     // Hash new password
@@ -48,10 +60,6 @@ export async function POST(request: Request) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Reset password error:", error);
-    return NextResponse.json(
-      { message: "Error resetting password" },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
