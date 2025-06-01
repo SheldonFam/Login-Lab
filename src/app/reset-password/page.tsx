@@ -164,14 +164,6 @@ export default function ResetPasswordPage() {
                   </p>
                 </div>
               </div>
-              <div className="mt-4 text-center">
-                <Link
-                  href="/login"
-                  className="font-semibold text-indigo-600 hover:text-indigo-500"
-                >
-                  Return to login
-                </Link>
-              </div>
             </div>
           ) : (
             <>
@@ -207,17 +199,16 @@ export default function ResetPasswordPage() {
                 submitLabel="Reset password"
                 isLoading={isLoading}
               />
-
-              <div className="mt-6 text-sm/6 text-center">
-                <Link
-                  href="/login"
-                  className="font-semibold text-indigo-600 hover:text-indigo-500"
-                >
-                  Back to login
-                </Link>
-              </div>
             </>
           )}
+          <div className="mt-6 text-sm/6 text-center">
+            <Link
+              href="/login"
+              className="font-semibold text-indigo-600 hover:text-indigo-500"
+            >
+              Back to login
+            </Link>
+          </div>
         </div>
       </div>
     </div>

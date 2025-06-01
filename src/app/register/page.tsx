@@ -8,10 +8,12 @@ import { Form } from "../components/form";
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleSubmit = async (values: { [key: string]: string }) => {
     setIsLoading(true);
     setError("");
+    setSuccessMessage(""); // Clear previous messages
 
     try {
       const response = await fetch("/api/register", {
@@ -28,7 +30,11 @@ export default function RegisterPage() {
       });
 
       if (response.ok) {
-        window.location.href = "/login?registered=true";
+        setSuccessMessage("Registration successful! Redirecting to login...");
+        // Redirect after 3 seconds
+        setTimeout(() => {
+          window.location.href = "/login?registered=true";
+        }, 3000); // 3000 milliseconds = 3 seconds
       } else {
         const data = await response.json();
         setError(data.message || "Registration failed");
@@ -104,6 +110,7 @@ export default function RegisterPage() {
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
           <div className="bg-white px-6 py-12 shadow-sm sm:rounded-lg sm:px-12">
+            {/* Error Message */}
             {error && (
               <div className="mb-4 rounded-md bg-red-50 p-4">
                 <div className="flex">
@@ -130,12 +137,42 @@ export default function RegisterPage() {
               </div>
             )}
 
-            <Form
-              fields={fields}
-              onSubmit={handleSubmit}
-              submitLabel="Create account"
-              isLoading={isLoading}
-            />
+            {/* Success Message */}
+            {successMessage && (
+              <div className="mb-4 rounded-md bg-green-50 p-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg
+                      className="h-5 w-5 text-green-400"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.06l3 3a.75.75 0 001.137-.089l4.003-5.5z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-green-800">
+                      {successMessage}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Form (hidden when success message is shown) */}
+            {!successMessage && (
+              <Form
+                fields={fields}
+                onSubmit={handleSubmit}
+                submitLabel="Create account"
+                isLoading={isLoading}
+              />
+            )}
           </div>
         </div>
 
