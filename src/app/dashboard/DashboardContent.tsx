@@ -35,10 +35,9 @@ export default function DashboardContent() {
   }, []);
 
   const handleSignOut = async () => {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
     await signOut({
       redirect: true,
-      callbackUrl: `${baseUrl}/login`,
+      callbackUrl: "/login",
     });
   };
 
@@ -89,7 +88,7 @@ export default function DashboardContent() {
           <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
             <div className="px-4 py-6 sm:p-8">
               <div className="max-w-2xl text-base leading-7 text-gray-700">
-                <p>Welcome back!</p>
+                <p>Welcome back {session.user?.name || "User"}!</p>
                 <p className="mt-2">Last login: {lastLogin}</p>
               </div>
             </div>
