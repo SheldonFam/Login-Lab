@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Form } from "@/app/components/Form";
-import { Alert } from "@/app/components/Alert";
+import Form from "../components/form";
+import Alert from "../components/alert";
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);

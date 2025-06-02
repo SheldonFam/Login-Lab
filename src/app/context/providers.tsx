@@ -2,9 +2,8 @@
 
 import { SessionProvider } from "next-auth/react";
 import { useState, useEffect } from "react";
-import { Loading } from "@/app/components/Loading";
-
 import { AuthProvider } from "./auth-context";
+import Loading from "../components/loading";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);

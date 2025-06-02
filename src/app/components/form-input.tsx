@@ -27,7 +27,7 @@ interface FormInputProps {
   showError?: boolean;
 }
 
-export function FormInput({
+export default function FormInput({
   id,
   name,
   type,

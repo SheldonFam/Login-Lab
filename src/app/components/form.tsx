@@ -1,9 +1,8 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { FormInput } from "./FormInput";
-import { Button } from "@/app/components/Button";
-
+import FormInput from "./form-input";
+import Button from "./button.";
 interface FormValues {
   [key: string]: string;
 }
@@ -26,7 +25,12 @@ interface FormProps {
   isLoading?: boolean;
 }
 
-export function Form({ fields, onSubmit, submitLabel, isLoading }: FormProps) {
+export default function Form({
+  fields,
+  onSubmit,
+  submitLabel,
+  isLoading,
+}: FormProps) {
   const {
     register,
     handleSubmit,

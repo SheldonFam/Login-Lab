@@ -7,7 +7,7 @@ interface AlertProps {
   message: string;
 }
 
-export function Alert({ type, message }: AlertProps) {
+export default function Alert({ type, message }: AlertProps) {
   const styles = {
     error: {
       container: "bg-red-50",

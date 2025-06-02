@@ -3,7 +3,7 @@ import { signOut } from "next-auth/react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/auth-context";
-import { Loading } from "@/app/components/Loading";
+import Loading from "../components/loading";
 
 export default function DashboardContent() {
   const { session, isLoading } = useAuth();

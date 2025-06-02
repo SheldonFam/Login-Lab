@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Form } from "@/app/components/Form";
 import Link from "next/link";
 import Image from "next/image";
-import { Alert } from "@/app/components/Alert";
-import { Button } from "@/app/components/Button";
+import Form from "../components/form";
+import Alert from "../components/alert";
+import Button from "../components/button.";
 
 export default function LoginPage() {
   const router = useRouter();
