@@ -2,7 +2,7 @@
 
 import { SessionProvider } from "next-auth/react";
 import { useState, useEffect } from "react";
-import { Loading } from "../components/loading";
+import { Loading } from "../components/Loading";
 import { AuthProvider } from "./auth-context";
 
 export function Providers({ children }: { children: React.ReactNode }) {

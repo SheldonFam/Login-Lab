@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Form } from "../components/form";
+import { Form } from "../components/Form";
 import { useSearchParams } from "next/navigation";
+import { Alert } from "../components/Alert";
 
 export default function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -86,36 +87,14 @@ export default function ResetPasswordPage() {
     return (
       <div className="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="rounded-md bg-red-50 p-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg
-                  className="h-5 w-5 text-red-400"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">
-                  Invalid or missing reset token
-                </h3>
-              </div>
-            </div>
-            <div className="mt-4 text-center">
-              <Link
-                href="/forgot-password"
-                className="font-semibold text-indigo-600 hover:text-indigo-500"
-              >
-                Request a new password reset
-              </Link>
-            </div>
+          <Alert type="error" message="Invalid or missing reset token" />
+          <div className="mt-4 text-center">
+            <Link
+              href="/forgot-password"
+              className="font-semibold text-indigo-600 hover:text-indigo-500"
+            >
+              Request a new password reset
+            </Link>
           </div>
         </div>
       </div>
@@ -142,56 +121,26 @@ export default function ResetPasswordPage() {
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
         <div className="bg-white px-6 py-12 shadow-sm sm:rounded-lg sm:px-12">
-          {success ? (
-            <div className="rounded-md bg-green-50 p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg
-                    className="h-5 w-5 text-green-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-green-800">
-                    Password has been reset successfully!
-                  </p>
-                </div>
+          {!token ? (
+            <>
+              <Alert type="error" message="Invalid or missing reset token" />
+              <div className="mt-4 text-center">
+                <Link
+                  href="/forgot-password"
+                  className="font-semibold text-indigo-600 hover:text-indigo-500"
+                >
+                  Request a new password reset
+                </Link>
               </div>
-            </div>
+            </>
+          ) : success ? (
+            <Alert
+              type="success"
+              message="Password has been reset successfully!"
+            />
           ) : (
             <>
-              {error && (
-                <div className="mb-4 rounded-md bg-red-50 p-4">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <svg
-                        className="h-5 w-5 text-red-400"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <div className="ml-3">
-                      <h3 className="text-sm font-medium text-red-800">
-                        {error}
-                      </h3>
-                    </div>
-                  </div>
-                </div>
-              )}
+              {error && <Alert type="error" message={error} />}
 
               <Form
                 fields={fields}
