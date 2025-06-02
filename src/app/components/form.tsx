@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { FormInput } from "./FormInput";
-import { Button } from "./Button";
+import { Button } from "@/app/components/Button";
 
 interface FormValues {
   [key: string]: string;

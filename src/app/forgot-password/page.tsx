@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Form } from "../components/Form";
-import { Alert } from "../components/Alert";
+import { Form } from "@/app/components/Form";
+import { Alert } from "@/app/components/Alert";
 
 export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);

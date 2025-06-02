@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Form } from "../components/Form";
+import { Form } from "@/app/components/Form";
 import { useSearchParams } from "next/navigation";
-import { Alert } from "../components/Alert";
+import { Alert } from "@/app/components/Alert";
 
 export default function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
