@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Form from "../components/form";
-import Alert from "../components/alert";
+import Alert from "../components/alert-c";
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);

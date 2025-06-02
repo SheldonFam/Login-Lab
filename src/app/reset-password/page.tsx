@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import Form from "../components/form";
-import Alert from "../components/alert";
+import Alert from "../components/alert-c";
 
 export default function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);

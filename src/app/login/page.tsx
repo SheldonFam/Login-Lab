@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import Form from "../components/form";
-import Alert from "../components/alert";
+import Alert from "../components/alert-c";
 import Button from "../components/button.";
 
 export default function LoginPage() {
