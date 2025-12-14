@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import Form from "../components/form";
 import Alert from "../components/alert";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -34,7 +36,7 @@ export default function RegisterPage() {
         setSuccessMessage("Registration successful! Redirecting to login...");
         // Redirect after 3 seconds
         setTimeout(() => {
-          window.location.href = "/login?registered=true";
+          router.push("/login?registered=true");
         }, 3000); // 3000 milliseconds = 3 seconds
       } else {
         const data = await response.json();

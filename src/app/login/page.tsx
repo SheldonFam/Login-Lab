@@ -7,14 +7,14 @@ import Link from "next/link";
 import Image from "next/image";
 import Form from "../components/form";
 import Alert from "../components/alert";
-import Button from "../components/button.";
+import Button from "../components/button";
 
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (values: { [key: string]: string }) => {
+  const handleSubmit = async (values: { [key: string]: string | boolean }) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -22,7 +22,7 @@ export default function LoginPage() {
       const result = await signIn("credentials", {
         email: values.email,
         password: values.password,
-        remember: values.remember === "on",
+        remember: values.remember === true,
         redirect: false,
       });
 
@@ -80,27 +80,20 @@ export default function LoginPage() {
                 showPasswordToggle: true,
                 autoComplete: "current-password",
               },
+              {
+                id: "remember",
+                name: "remember",
+                type: "checkbox",
+                label: "Remember me",
+                required: false,
+              },
             ]}
             onSubmit={handleSubmit}
             submitLabel="Sign in"
             isLoading={isLoading}
           />
 
-          <div className="flex items-center justify-between mt-4">
-            <div className="flex items-center">
-              <input
-                id="remember"
-                name="remember"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-              />
-              <label
-                htmlFor="remember"
-                className="ml-2 block text-sm text-gray-900"
-              >
-                Remember me
-              </label>
-            </div>
+          <div className="flex items-center justify-end mt-4">
             <div className="text-sm">
               <Link
                 href="/forgot-password"
