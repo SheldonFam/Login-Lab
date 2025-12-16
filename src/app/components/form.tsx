@@ -118,9 +118,8 @@ export default function Form({
         <FormInput
           key={field.id}
           {...field}
-          register={register}
+          registerProps={register(field.name, getValidationRules(field))}
           errors={errors}
-          validation={getValidationRules(field)}
           showError={
             isSubmitted || touchedFields[field.name] || dirtyFields[field.name]
           } // Show error if field is touched, dirty, or form is submitted
