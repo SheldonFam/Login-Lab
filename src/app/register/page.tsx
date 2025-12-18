@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import Form from "../components/form";
 import Alert from "../components/alert";
+import { registerSchema, type RegisterFormData } from "../schemas/auth.schema";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -13,10 +16,16 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  const handleSubmit = async (values: { [key: string]: string }) => {
+  const { register, handleSubmit, formState } = useForm<RegisterFormData>({
+    mode: "onChange",
+    reValidateMode: "onChange",
+    resolver: zodResolver(registerSchema),
+  });
+
+  const onSubmit = async (values: RegisterFormData) => {
     setIsLoading(true);
     setError("");
-    setSuccessMessage(""); // Clear previous messages
+    setSuccessMessage("");
 
     try {
       const response = await fetch("/api/register", {
@@ -34,10 +43,9 @@ export default function RegisterPage() {
 
       if (response.ok) {
         setSuccessMessage("Registration successful! Redirecting to login...");
-        // Redirect after 3 seconds
         setTimeout(() => {
           router.push("/login?registered=true");
-        }, 3000); // 3000 milliseconds = 3 seconds
+        }, 3000);
       } else {
         const data = await response.json();
         setError(data.message || "Registration failed");
@@ -49,53 +57,6 @@ export default function RegisterPage() {
       setIsLoading(false);
     }
   };
-
-  const fields = [
-    {
-      id: "name",
-      name: "name",
-      type: "text",
-      label: "Full name",
-      placeholder: "Enter your full name",
-      required: true,
-      autoComplete: "name",
-      showAsterisk: true,
-    },
-    {
-      id: "email",
-      name: "email",
-      type: "email",
-      label: "Email address",
-      placeholder: "Enter your email",
-      required: true,
-      autoComplete: "email",
-      showAsterisk: true,
-    },
-    {
-      id: "password",
-      name: "password",
-      type: "password",
-      label: "Password",
-      placeholder: "Create a password",
-      required: true,
-      showPasswordToggle: true,
-      autoComplete: "new-password",
-      showAsterisk: true,
-      helperText:
-        "Must be at least 8 characters with uppercase, lowercase, number and special character",
-    },
-    {
-      id: "confirmPassword",
-      name: "confirmPassword",
-      type: "password",
-      label: "Confirm new password",
-      placeholder: "Confirm your new password",
-      required: true,
-      showPasswordToggle: true,
-      autoComplete: "new-password",
-      showAsterisk: true,
-    },
-  ];
 
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -124,8 +85,56 @@ export default function RegisterPage() {
             {/* Form (hidden when success message is shown) */}
             {!successMessage && (
               <Form
-                fields={fields}
-                onSubmit={handleSubmit}
+                fields={[
+                  {
+                    id: "name",
+                    name: "name",
+                    type: "text",
+                    label: "Full name",
+                    placeholder: "Enter your full name",
+                    required: true,
+                    autoComplete: "name",
+                    showAsterisk: true,
+                  },
+                  {
+                    id: "email",
+                    name: "email",
+                    type: "email",
+                    label: "Email address",
+                    placeholder: "Enter your email",
+                    required: true,
+                    autoComplete: "email",
+                    showAsterisk: true,
+                  },
+                  {
+                    id: "password",
+                    name: "password",
+                    type: "password",
+                    label: "Password",
+                    placeholder: "Create a password",
+                    required: true,
+                    showPasswordToggle: true,
+                    autoComplete: "new-password",
+                    showAsterisk: true,
+                    helperText:
+                      "Must be at least 8 characters with uppercase, lowercase, number and special character",
+                  },
+                  {
+                    id: "confirmPassword",
+                    name: "confirmPassword",
+                    type: "password",
+                    label: "Confirm new password",
+                    placeholder: "Confirm your new password",
+                    required: true,
+                    showPasswordToggle: true,
+                    autoComplete: "new-password",
+                    showAsterisk: true,
+                  },
+                ]}
+                register={register}
+                handleSubmit={handleSubmit}
+                onSubmit={onSubmit}
+                formState={formState}
                 submitLabel="Create account"
                 isLoading={isLoading}
               />

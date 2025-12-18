@@ -1,17 +1,31 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import Image from "next/image";
 import Form from "../components/form";
 import Alert from "../components/alert";
+import {
+  forgotPasswordSchema,
+  type ForgotPasswordFormData,
+} from "../schemas/auth.schema";
 
 export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = async (values: { [key: string]: string }) => {
+  const { register, handleSubmit, formState } = useForm<ForgotPasswordFormData>(
+    {
+      mode: "onChange",
+      reValidateMode: "onChange",
+      resolver: zodResolver(forgotPasswordSchema),
+    }
+  );
+
+  const onSubmit = async (values: ForgotPasswordFormData) => {
     setIsLoading(true);
     setError("");
     setSuccess(false);
@@ -38,19 +52,6 @@ export default function ForgotPasswordPage() {
       setIsLoading(false);
     }
   };
-
-  const fields = [
-    {
-      id: "email",
-      name: "email",
-      type: "email",
-      label: "Email address",
-      placeholder: "Email address",
-      required: true,
-      autoComplete: "email",
-      showAsterisk: true,
-    },
-  ];
 
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -83,8 +84,22 @@ export default function ForgotPasswordPage() {
               {error && <Alert type="error" message={error} />}
 
               <Form
-                fields={fields}
-                onSubmit={handleSubmit}
+                fields={[
+                  {
+                    id: "email",
+                    name: "email",
+                    type: "email",
+                    label: "Email address",
+                    placeholder: "Email address",
+                    required: true,
+                    autoComplete: "email",
+                    showAsterisk: true,
+                  },
+                ]}
+                register={register}
+                handleSubmit={handleSubmit}
+                onSubmit={onSubmit}
+                formState={formState}
                 submitLabel="Send reset link"
                 isLoading={isLoading}
               />

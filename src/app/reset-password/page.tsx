@@ -1,11 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import Form from "../components/form";
 import Alert from "../components/alert";
+import {
+  resetPasswordSchema,
+  type ResetPasswordFormData,
+} from "../schemas/auth.schema";
 
 export default function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -14,13 +20,19 @@ export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
+  const { register, handleSubmit, formState } = useForm<ResetPasswordFormData>({
+    mode: "onChange",
+    reValidateMode: "onChange",
+    resolver: zodResolver(resetPasswordSchema),
+  });
+
   useEffect(() => {
     if (!token) {
       setError("Invalid or missing reset token");
     }
   }, [token]);
 
-  const handleSubmit = async (values: { [key: string]: string }) => {
+  const onSubmit = async (values: ResetPasswordFormData) => {
     if (!token) {
       setError("Invalid or missing reset token");
       return;
@@ -55,33 +67,6 @@ export default function ResetPasswordPage() {
       setIsLoading(false);
     }
   };
-
-  const fields = [
-    {
-      id: "password",
-      name: "password",
-      type: "password",
-      label: "New password",
-      placeholder: "Enter your new password",
-      required: true,
-      showPasswordToggle: true,
-      autoComplete: "new-password",
-      showAsterisk: true,
-      helperText:
-        "Must be at least 8 characters with uppercase, lowercase, number and special character",
-    },
-    {
-      id: "confirmPassword",
-      name: "confirmPassword",
-      type: "password",
-      label: "Confirm new password",
-      placeholder: "Confirm your new password",
-      required: true,
-      showPasswordToggle: true,
-      autoComplete: "new-password",
-      showAsterisk: true,
-    },
-  ];
 
   if (!token) {
     return (
@@ -143,8 +128,36 @@ export default function ResetPasswordPage() {
               {error && <Alert type="error" message={error} />}
 
               <Form
-                fields={fields}
-                onSubmit={handleSubmit}
+                fields={[
+                  {
+                    id: "password",
+                    name: "password",
+                    type: "password",
+                    label: "New password",
+                    placeholder: "Enter your new password",
+                    required: true,
+                    showPasswordToggle: true,
+                    autoComplete: "new-password",
+                    showAsterisk: true,
+                    helperText:
+                      "Must be at least 8 characters with uppercase, lowercase, number and special character",
+                  },
+                  {
+                    id: "confirmPassword",
+                    name: "confirmPassword",
+                    type: "password",
+                    label: "Confirm new password",
+                    placeholder: "Confirm your new password",
+                    required: true,
+                    showPasswordToggle: true,
+                    autoComplete: "new-password",
+                    showAsterisk: true,
+                  },
+                ]}
+                register={register}
+                handleSubmit={handleSubmit}
+                onSubmit={onSubmit}
+                formState={formState}
                 submitLabel="Reset password"
                 isLoading={isLoading}
               />

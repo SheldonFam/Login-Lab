@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -8,13 +10,20 @@ import Image from "next/image";
 import Form from "../components/form";
 import Alert from "../components/alert";
 import Button from "../components/button";
+import { loginSchema, type LoginFormData } from "../schemas/auth.schema";
 
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (values: { [key: string]: string | boolean }) => {
+  const { register, handleSubmit, formState } = useForm<LoginFormData>({
+    mode: "onChange",
+    reValidateMode: "onChange",
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = async (values: LoginFormData) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -88,7 +97,10 @@ export default function LoginPage() {
                 required: false,
               },
             ]}
-            onSubmit={handleSubmit}
+            register={register}
+            formState={formState}
+            handleSubmit={handleSubmit}
+            onSubmit={onSubmit}
             submitLabel="Sign in"
             isLoading={isLoading}
           />
