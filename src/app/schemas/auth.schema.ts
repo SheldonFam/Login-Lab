@@ -4,32 +4,12 @@ import { z } from "zod";
 const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-// Common email domains for validation
-const commonDomains = [
-  "gmail.com",
-  "yahoo.com",
-  "hotmail.com",
-  "outlook.com",
-  "icloud.com",
-  "protonmail.com",
-  "aol.com",
-];
-
 // Reusable email validation
 export const emailSchema = z
   .string()
   .min(1, "Email is required")
   .max(254, "Email must be less than 254 characters")
-  .email("Please enter a valid email address")
-  .refine(
-    (email) => {
-      const domain = email.split("@")[1]?.toLowerCase();
-      return commonDomains.includes(domain);
-    },
-    {
-      message: "Please use a common email domain",
-    }
-  );
+  .email("Please enter a valid email address");
 
 // Reusable password validation
 export const passwordSchema = z
