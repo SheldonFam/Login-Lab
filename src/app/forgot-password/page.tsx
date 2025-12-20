@@ -99,7 +99,8 @@ export default function ForgotPasswordPage() {
                 register={register}
                 handleSubmit={handleSubmit}
                 onSubmit={onSubmit}
-                formState={formState}
+                errors={formState.errors}
+                isSubmitted={formState.isSubmitted}
                 submitLabel="Send reset link"
                 isLoading={isLoading}
               />

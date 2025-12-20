@@ -98,9 +98,10 @@ export default function LoginPage() {
               },
             ]}
             register={register}
-            formState={formState}
             handleSubmit={handleSubmit}
             onSubmit={onSubmit}
+            errors={formState.errors}
+            isSubmitted={formState.isSubmitted}
             submitLabel="Sign in"
             isLoading={isLoading}
           />

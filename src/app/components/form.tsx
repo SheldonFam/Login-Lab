@@ -5,8 +5,7 @@ import {
   UseFormHandleSubmit,
   Path,
   FieldValues,
-  UseFormStateReturn,
-  get,
+  FieldErrors,
 } from "react-hook-form";
 import FormInput from "./form-input";
 import Button from "./button";
@@ -29,7 +28,8 @@ interface FormProps<TFormData extends FieldValues> {
   register: UseFormRegister<TFormData>;
   handleSubmit: UseFormHandleSubmit<TFormData>;
   onSubmit: (values: TFormData) => void;
-  formState: UseFormStateReturn<TFormData>;
+  errors: FieldErrors<TFormData>;
+  isSubmitted: boolean;
   submitLabel: string;
   isLoading?: boolean;
 }
@@ -39,32 +39,20 @@ export default function Form<TFormData extends FieldValues>({
   register,
   handleSubmit,
   onSubmit,
-  formState,
+  errors,
+  isSubmitted,
   submitLabel,
   isLoading,
 }: FormProps<TFormData>) {
-  const { errors, touchedFields, dirtyFields, isSubmitted } = formState;
-  const onFormSubmit = (values: TFormData) => {
-    onSubmit(values);
-  };
-
   return (
-    <form
-      onSubmit={handleSubmit(onFormSubmit)}
-      className="space-y-6"
-      noValidate
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
       {fields.map((field) => (
         <FormInput
           key={field.id}
           {...field}
           registerProps={register(field.name)}
           errors={errors}
-          showError={
-            isSubmitted ||
-            !!get(touchedFields, field.name) ||
-            !!get(dirtyFields, field.name)
-          }
+          showError={isSubmitted}
         />
       ))}
 
