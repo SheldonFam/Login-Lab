@@ -134,7 +134,8 @@ export default function RegisterPage() {
                 register={register}
                 handleSubmit={handleSubmit}
                 onSubmit={onSubmit}
-                formState={formState}
+                errors={formState.errors}
+                isSubmitted={formState.isSubmitted}
                 submitLabel="Create account"
                 isLoading={isLoading}
               />

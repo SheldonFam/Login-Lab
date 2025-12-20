@@ -157,7 +157,8 @@ export default function ResetPasswordPage() {
                 register={register}
                 handleSubmit={handleSubmit}
                 onSubmit={onSubmit}
-                formState={formState}
+                errors={formState.errors}
+                isSubmitted={formState.isSubmitted}
                 submitLabel="Reset password"
                 isLoading={isLoading}
               />
