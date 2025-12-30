@@ -3,11 +3,11 @@ import bcrypt from "bcrypt";
 import { prisma } from "../../lib/prisma";
 import {
   handleApiError,
-  validateEmail,
-  validatePassword,
   validateRequiredFields,
   createApiError,
 } from "../../lib/error-handler";
+import { BCRYPT_ROUNDS } from "../../lib/constants";
+import { registerSchema } from "../../schemas/auth.schema";
 
 export async function POST(request: Request) {
   try {
@@ -25,17 +25,17 @@ export async function POST(request: Request) {
 
     const { name, email, password } = body;
 
-    // Validate email format
-    if (!validateEmail(email)) {
-      throw createApiError("Invalid email format", 400);
-    }
+    // Validate using Zod schema
+    const validationResult = registerSchema.safeParse({
+      name,
+      email,
+      password,
+      confirmPassword: password, // For validation purposes
+    });
 
-    // Validate password strength
-    if (!validatePassword(password)) {
-      throw createApiError(
-        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
-        400
-      );
+    if (!validationResult.success) {
+      const firstError = validationResult.error.errors[0];
+      throw createApiError(firstError.message, 400);
     }
 
     // Check if user already exists
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
     // Create user
     const user = await prisma.user.create({

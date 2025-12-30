@@ -3,10 +3,11 @@ import { prisma } from "../../lib/prisma";
 import bcrypt from "bcrypt";
 import {
   handleApiError,
-  validatePassword,
   validateRequiredFields,
   createApiError,
 } from "../../lib/error-handler";
+import { resetPasswordSchema } from "../../schemas/auth.schema";
+import { BCRYPT_ROUNDS } from "../../lib/constants";
 
 export async function POST(request: Request) {
   try {
@@ -20,12 +21,15 @@ export async function POST(request: Request) {
 
     const { token, password } = body;
 
-    // Validate password strength
-    if (!validatePassword(password)) {
-      throw createApiError(
-        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
-        400
-      );
+    // Validate using Zod schema
+    const validationResult = resetPasswordSchema.safeParse({
+      password,
+      confirmPassword: password, // For validation purposes
+    });
+
+    if (!validationResult.success) {
+      const firstError = validationResult.error.errors[0];
+      throw createApiError(firstError.message, 400);
     }
 
     // Find user with valid reset token
@@ -43,7 +47,7 @@ export async function POST(request: Request) {
     }
 
     // Hash new password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
     // Update user's password and clear reset token
     await prisma.user.update({
