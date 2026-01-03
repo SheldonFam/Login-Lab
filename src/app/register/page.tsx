@@ -1,20 +1,21 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import Form from "../components/form";
 import Alert from "../components/alert";
 import { registerSchema, type RegisterFormData } from "../schemas/auth.schema";
+import { useRegister } from "../lib/hooks/use-register";
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const {
+    register: registerUser,
+    isLoading,
+    error,
+    successMessage,
+  } = useRegister();
 
   const { register, handleSubmit, formState } = useForm<RegisterFormData>({
     mode: "onChange",
@@ -23,39 +24,12 @@ export default function RegisterPage() {
   });
 
   const onSubmit = async (values: RegisterFormData) => {
-    setIsLoading(true);
-    setError("");
-    setSuccessMessage("");
-
-    try {
-      const response = await fetch("/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: values.name,
-          email: values.email,
-          password: values.password,
-          confirmPassword: values.confirmPassword,
-        }),
-      });
-
-      if (response.ok) {
-        setSuccessMessage("Registration successful! Redirecting to login...");
-        setTimeout(() => {
-          router.push("/login?registered=true");
-        }, 3000);
-      } else {
-        const data = await response.json();
-        setError(data.message || "Registration failed");
-      }
-    } catch (err: unknown) {
-      console.error("Registration error:", err);
-      setError("An error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+    await registerUser({
+      name: values.name,
+      email: values.email,
+      password: values.password,
+      confirmPassword: values.confirmPassword,
+    });
   };
 
   return (

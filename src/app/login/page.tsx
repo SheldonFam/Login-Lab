@@ -1,21 +1,18 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import Form from "../components/form";
 import Alert from "../components/alert";
 import Button from "../components/button";
 import { loginSchema, type LoginFormData } from "../schemas/auth.schema";
+import { useLogin } from "../lib/hooks/use-login";
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { login, isLoading, error } = useLogin();
 
   const { register, handleSubmit, formState } = useForm<LoginFormData>({
     mode: "onChange",
@@ -24,29 +21,11 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (values: LoginFormData) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      const result = await signIn("credentials", {
-        email: values.email,
-        password: values.password,
-        remember: values.remember === true,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setError(result.error);
-        return;
-      }
-
-      router.push("/dashboard");
-      router.refresh();
-    } catch {
-      setError("An error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+    await login({
+      email: values.email,
+      password: values.password,
+      remember: values.remember,
+    });
   };
 
   return (
