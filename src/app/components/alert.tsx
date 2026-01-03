@@ -1,5 +1,3 @@
-import React from "react";
-
 type AlertType = "error" | "success";
 
 interface AlertProps {
@@ -28,7 +26,10 @@ export default function Alert({ type, message }: AlertProps) {
   const currentStyle = styles[type];
 
   return (
-    <div className={`mb-4 rounded-md p-4 ${currentStyle.container}`}>
+    <div
+      role="alert"
+      className={`mb-4 rounded-md p-4 ${currentStyle.container}`}
+    >
       <div className="flex">
         <div className="flex-shrink-0">
           <svg
