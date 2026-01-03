@@ -1,23 +1,69 @@
 import nodemailer from "nodemailer";
+import {
+  GMAIL,
+  GOOGLE_APP_PASSWORD,
+  EMAIL_SERVER_HOST,
+  EMAIL_SERVER_PORT,
+  EMAIL_SERVER_USER,
+  EMAIL_SERVER_PASSWORD,
+  EMAIL_FROM,
+  hasEmailConfig,
+} from "./env";
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.GMAIL,
-    pass: process.env.GOOGLE_APP_PASSWORD,
-  },
-});
+// Create transporter based on available configuration
+// Lazy-loaded to avoid initialization errors at module load time
+let transporter: nodemailer.Transporter | null = null;
+
+const getTransporter = (): nodemailer.Transporter => {
+  if (transporter) {
+    return transporter;
+  }
+
+  // Legacy Gmail support
+  if (GMAIL && GOOGLE_APP_PASSWORD) {
+    transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: GMAIL,
+        pass: GOOGLE_APP_PASSWORD,
+      },
+    });
+    return transporter;
+  }
+
+  // Generic SMTP support
+  if (EMAIL_SERVER_HOST && EMAIL_SERVER_USER && EMAIL_SERVER_PASSWORD) {
+    transporter = nodemailer.createTransport({
+      host: EMAIL_SERVER_HOST,
+      port: EMAIL_SERVER_PORT ? parseInt(EMAIL_SERVER_PORT, 10) : 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: EMAIL_SERVER_USER,
+        pass: EMAIL_SERVER_PASSWORD,
+      },
+    });
+    return transporter;
+  }
+
+  throw new Error(
+    "Email configuration is missing. Please configure either Gmail or SMTP settings."
+  );
+};
 
 export async function sendResetEmail(email: string, resetUrl: string) {
   try {
-    if (!process.env.GMAIL || !process.env.GOOGLE_APP_PASSWORD) {
+    if (!hasEmailConfig()) {
       throw new Error(
         "Email configuration is missing. Please check your environment variables."
       );
     }
 
+    const emailTransporter = getTransporter();
+    const fromEmail =
+      EMAIL_FROM || GMAIL || EMAIL_SERVER_USER || "noreply@example.com";
+
     const mailOptions = {
-      from: process.env.GMAIL, // Use the same Gmail address as the sender
+      from: fromEmail,
       to: email,
       subject: "Reset Your Password",
       html: `
@@ -39,7 +85,7 @@ export async function sendResetEmail(email: string, resetUrl: string) {
       `,
     };
 
-    await transporter.sendMail(mailOptions);
+    await emailTransporter.sendMail(mailOptions);
 
     return true;
   } catch (error) {

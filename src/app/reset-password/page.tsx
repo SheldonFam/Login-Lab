@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -12,11 +11,10 @@ import {
   resetPasswordSchema,
   type ResetPasswordFormData,
 } from "../schemas/auth.schema";
+import { useResetPassword } from "../lib/hooks/use-reset-password";
 
 export default function ResetPasswordPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+  const { reset, isLoading, error, success } = useResetPassword();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
@@ -26,46 +24,16 @@ export default function ResetPasswordPage() {
     resolver: zodResolver(resetPasswordSchema),
   });
 
-  useEffect(() => {
-    if (!token) {
-      setError("Invalid or missing reset token");
-    }
-  }, [token]);
-
   const onSubmit = async (values: ResetPasswordFormData) => {
     if (!token) {
-      setError("Invalid or missing reset token");
       return;
     }
 
-    setIsLoading(true);
-    setError("");
-    setSuccess(false);
-
-    try {
-      const response = await fetch("/api/reset-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          token,
-          password: values.password,
-        }),
-      });
-
-      if (response.ok) {
-        setSuccess(true);
-      } else {
-        const data = await response.json();
-        setError(data.message || "Failed to reset password");
-      }
-    } catch (err: unknown) {
-      console.error("Reset password error:", err);
-      setError("An error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+    await reset({
+      token,
+      password: values.password,
+      confirmPassword: values.confirmPassword,
+    });
   };
 
   if (!token) {

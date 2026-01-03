@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -11,11 +10,10 @@ import {
   forgotPasswordSchema,
   type ForgotPasswordFormData,
 } from "../schemas/auth.schema";
+import { useForgotPassword } from "../lib/hooks/use-forgot-password";
 
 export default function ForgotPasswordPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+  const { requestReset, isLoading, error, success } = useForgotPassword();
 
   const { register, handleSubmit, formState } = useForm<ForgotPasswordFormData>(
     {
@@ -26,31 +24,7 @@ export default function ForgotPasswordPage() {
   );
 
   const onSubmit = async (values: ForgotPasswordFormData) => {
-    setIsLoading(true);
-    setError("");
-    setSuccess(false);
-
-    try {
-      const response = await fetch("/api/forgot-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: values.email }),
-      });
-
-      if (response.ok) {
-        setSuccess(true);
-      } else {
-        const data = await response.json();
-        setError(data.message || "Failed to send reset email");
-      }
-    } catch (err: unknown) {
-      console.error("Forgot password error:", err);
-      setError("An error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+    await requestReset(values.email);
   };
 
   return (

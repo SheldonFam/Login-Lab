@@ -61,16 +61,9 @@ export function handleApiError(error: unknown) {
   );
 }
 
-export const validateEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-};
-
-export const validatePassword = (password: string): boolean => {
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-  return passwordRegex.test(password);
-};
+// Note: Email and password validation should be done using Zod schemas
+// from src/app/schemas/auth.schema.ts instead of these functions.
+// This file should only contain error handling utilities.
 
 export const validateRequiredFields = (
   data: Record<string, unknown>,

@@ -4,10 +4,12 @@ import crypto from "crypto";
 import { sendResetEmail } from "@/app/lib/email";
 import {
   handleApiError,
-  validateEmail,
   validateRequiredFields,
   createApiError,
 } from "../../lib/error-handler";
+import { forgotPasswordSchema } from "../../schemas/auth.schema";
+import { RESET_TOKEN_BYTES, RESET_TOKEN_EXPIRY_MS } from "../../lib/constants";
+import { NEXT_PUBLIC_APP_URL } from "../../lib/env";
 
 export async function POST(request: Request) {
   try {
@@ -21,9 +23,11 @@ export async function POST(request: Request) {
 
     const { email } = body;
 
-    // Validate email format
-    if (!validateEmail(email)) {
-      throw createApiError("Invalid email format", 400);
+    // Validate using Zod schema
+    const validationResult = forgotPasswordSchema.safeParse({ email });
+    if (!validationResult.success) {
+      const firstError = validationResult.error.errors[0];
+      throw createApiError(firstError.message, 400);
     }
 
     // Find user
@@ -43,8 +47,8 @@ export async function POST(request: Request) {
     }
 
     // Generate reset token
-    const resetToken = crypto.randomBytes(32).toString("hex");
-    const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour from now
+    const resetToken = crypto.randomBytes(RESET_TOKEN_BYTES).toString("hex");
+    const resetTokenExpiry = new Date(Date.now() + RESET_TOKEN_EXPIRY_MS);
 
     // Save reset token to database
     await prisma.user.update({
@@ -57,7 +61,7 @@ export async function POST(request: Request) {
 
     // Send reset email
     try {
-      const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${resetToken}`;
+      const resetUrl = `${NEXT_PUBLIC_APP_URL}/reset-password?token=${resetToken}`;
       await sendResetEmail(email, resetUrl);
     } catch (emailError) {
       console.error("Failed to send reset email:", emailError);

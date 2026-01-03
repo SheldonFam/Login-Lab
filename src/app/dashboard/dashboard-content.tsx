@@ -1,53 +1,42 @@
 "use client";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "../context/auth-context";
 import Loading from "../components/loading";
+import Button from "../components/button";
+import { formatDateTime } from "../lib/utils/date";
 
 export default function DashboardContent() {
   const { session, isLoading } = useAuth();
-  const [lastLogin, setLastLogin] = useState<string>("");
-
-  useEffect(() => {
-    // Use a consistent date format that doesn't depend on locale
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-
-    let hours = now.getHours();
-
-    const minutes = String(now.getMinutes()).padStart(2, "0");
-    const seconds = String(now.getSeconds()).padStart(2, "0");
-
-    const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12;
-    hours = hours === 0 ? 12 : hours; // the hour '0' should be '12'
-
-    const formattedTime = `${String(hours).padStart(
-      2,
-      "0"
-    )}:${minutes}:${seconds} ${ampm}`;
-    const formattedDateTime = `${year}-${month}-${day} ${formattedTime}`;
-
-    setLastLogin(formattedDateTime);
-  }, []);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const currentTime = formatDateTime();
 
   const handleSignOut = async () => {
-    await signOut({
-      redirect: true,
-      callbackUrl: "/login",
-    });
+    try {
+      setIsSigningOut(true);
+      await signOut({
+        redirect: true,
+        callbackUrl: "/login",
+      });
+    } catch (error) {
+      console.error("Sign out error:", error);
+      setIsSigningOut(false);
+      // Note: If signOut fails, we reset the loading state
+      // The error will be handled by NextAuth's error handling
+    }
   };
 
   if (isLoading) {
     return <Loading />;
   }
 
-  if (!session) {
+  if (!session?.user) {
     return null; // This should never happen due to the server-side check
   }
+
+  const userName = session.user.name || "User";
+  const userEmail = session.user.email || "";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -69,14 +58,18 @@ export default function DashboardContent() {
               </h1>
             </div>
             <div className="flex items-center gap-4">
-              <div className="text-sm text-gray-700">{session.user?.email}</div>
-              <button
+              <div className="text-sm text-gray-700" aria-label="User email">
+                {userEmail}
+              </div>
+              <Button
                 type="button"
                 onClick={handleSignOut}
-                className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                isLoading={isSigningOut}
+                disabled={isSigningOut}
+                aria-label="Sign out of your account"
               >
                 Sign out
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -88,8 +81,13 @@ export default function DashboardContent() {
           <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
             <div className="px-4 py-6 sm:p-8">
               <div className="max-w-2xl text-base leading-7 text-gray-700">
-                <p>Welcome back {session.user?.name || "User"}!</p>
-                <p className="mt-2">Last login: {lastLogin}</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  Welcome back, {userName}!
+                </p>
+                <p className="mt-2 text-gray-600">
+                  Current session time:{" "}
+                  <time dateTime={new Date().toISOString()}>{currentTime}</time>
+                </p>
               </div>
             </div>
           </div>

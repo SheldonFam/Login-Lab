@@ -7,6 +7,14 @@ import GitHubProvider from "next-auth/providers/github";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "../lib/prisma";
 import bcrypt from "bcrypt";
+import {
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  GITHUB_CLIENT_ID,
+  GITHUB_CLIENT_SECRET,
+  hasGoogleOAuth,
+  hasGitHubOAuth,
+} from "../lib/env";
 
 declare module "next-auth" {
   interface Session {
@@ -62,14 +70,22 @@ export const authOptions: NextAuthOptions = {
         };
       },
     }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-    GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-    }),
+    ...(hasGoogleOAuth()
+      ? [
+          GoogleProvider({
+            clientId: GOOGLE_CLIENT_ID!,
+            clientSecret: GOOGLE_CLIENT_SECRET!,
+          }),
+        ]
+      : []),
+    ...(hasGitHubOAuth()
+      ? [
+          GitHubProvider({
+            clientId: GITHUB_CLIENT_ID!,
+            clientSecret: GITHUB_CLIENT_SECRET!,
+          }),
+        ]
+      : []),
   ],
   pages: {
     signIn: "/login",
